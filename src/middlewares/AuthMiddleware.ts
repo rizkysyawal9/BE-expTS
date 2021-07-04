@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
-export const auth = (req: Request, res: Response, next: NextFunction): Response => {
+export const auth = (req: Request, res: Response, next: NextFunction): Response | void => {
     // check if authorization header is filled
     if(!req.headers.authorization){
         return res.status(401).json({
@@ -16,9 +16,10 @@ export const auth = (req: Request, res: Response, next: NextFunction): Response 
     try {
         // verify token
         const credentials: string | object = jwt.verify(token, secretKey)
+        console.log(credentials)
         if(credentials) {
             req.app.locals.credentials = credentials
-            next()
+            return next()
         } 
         return res.status(422).json({
             success: false,

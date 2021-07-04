@@ -6,8 +6,8 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 
 //Routers 
-import UserRoutes from './routers/UserRoutes';
 import AuthRoutes from './routers/AuthRoutes';
+import TodoRoutes from './routers/TodoRoutes';
 
 class App {
     public app: Application;
@@ -36,8 +36,8 @@ class App {
 
     // Used to define routes
     protected routes(): void {
-        this.app.use("/api/v1/users", UserRoutes)
         this.app.use("/api/v1/auth", AuthRoutes)
+        this.app.use("/api/v1/todo", TodoRoutes)
     }
 }
 
@@ -48,6 +48,7 @@ app.listen(port, () => {
     console.log("Aplikasi ini berjalan di port " + port);
     console.log(process.env.DB_HOST)
 })
+
 
 
 
