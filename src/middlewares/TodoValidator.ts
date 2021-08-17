@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { check, ValidationError, validationResult, Result } from 'express-validator'
+
 const todoValidator = [
     check('description').isString(),
     (req: Request, res: Response, next: NextFunction)=> {
