@@ -4,13 +4,12 @@ import compression from 'compression'
 import helmet from 'helmet';
 import cors from 'cors'
 import dotenv from 'dotenv'
-import grahql, { GraphQLSchema, GraphQLInt, GraphQLString, GraphQLObjectType, GraphQLList } from 'graphql'
 import { graphqlHTTP } from 'express-graphql';  
+import { schema } from './schemas-gql';
 
 //Ruters 
 import AuthRoutes from './routers/AuthRoutes';
 import TodoRoutes from './routers/TodoRoutes';
-import { resolve } from 'bluebird';
 const userData = require('../mockData.json');
 
 class App {
@@ -42,87 +41,17 @@ class App {
     protected routes(): void {
         this.app.use("/api/v1/auth", AuthRoutes)
         this.app.use("/api/v1/todo", TodoRoutes)
+        // Initailize graphql server
+        this.app.use('/graphql', graphqlHTTP({
+            schema, 
+            graphiql: true
+        }))
     }
 }
 
 const port: number = 8000;
 // Initialize Express application
 const app = new App().app;
-
-const UserType = new GraphQLObjectType({
-    name:"User",
-    fields: () => ({
-        id: {type: GraphQLInt},
-        firstName: {type: GraphQLString},
-        lastName: {type: GraphQLString},
-        email: {type: GraphQLString},
-        password: {type: GraphQLString},
-    })
-})
-
-const RootQuery = new GraphQLObjectType({
-    name: 'RootQuery',
-    fields: {
-        getAllUsers: {
-            type: GraphQLList(UserType),
-            args: 
-            {
-                id: {
-                    type: GraphQLInt
-                }
-            },
-            resolve(parent, args) {
-                // do database queries
-                return userData
-            }
-        }
-    }
-})
-const Mutation = new GraphQLObjectType({
-    name: 'Mutation',
-    fields: {
-        createUers: {
-            type: UserType,
-            args: {
-                email: {
-                    type: GraphQLString
-                },
-                password: {
-                    type: GraphQLString
-                },
-                firstName: {
-                    type: GraphQLString
-                },
-                lastName: {
-                    type: GraphQLString
-                }
-            },
-            resolve(parent, args){
-                userData.push({
-                    id: userData.length +1,
-                    firstName: args.firstName,
-                    lastName: args.lastName,
-                    email: args.email,
-                    password: args.password
-                })
-                return args
-            }
-
-        }
-    } 
-})
-
-const schema = new GraphQLSchema({
-    query: RootQuery,
-    mutation: Mutation
-})
-
-// Initailize graphql server
-app.use('/graphql', graphqlHTTP({
-    schema, 
-    graphiql: true
-}))
-
 
 app.listen(port, () => {
     console.log("Aplikasi ini berjalan di port " + port);
